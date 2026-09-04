@@ -12,7 +12,7 @@ const { siteTitle, siteLogo, isLoggedIn = false } = Astro.props;
 
 // Top utility strip links (subtle)
 const UTILITY_LINKS = [
-	{ label: "Newsletters", href: "/pages/about" },
+	{ label: "Newsletters", href: "/newsletter" },
 	{ label: "Live TV", href: "/video" },
 	{ label: "About", href: "/pages/about" },
 ];
@@ -71,10 +71,10 @@ const UTILITY_LINKS = [
 					collections={["posts", "pages"]}
 				/>
 				<a
-					href="/_emdash/admin"
+					href="/sign-in"
 					class="snav-signin">{isLoggedIn ? "Admin" : "Sign In"}</a
 				>
-				<a href="/pages/about" class="snav-subscribe">Subscribe</a>
+				<a href="/newsletter" class="snav-subscribe">Subscribe</a>
 			</div>
 		</div>
 	</div>
@@ -175,6 +175,8 @@ const UTILITY_LINKS = [
 			<a href="/search" class="snav-mobile-searchlink">Search THE SUSTAINOMICS →</a>
 		</div>
 		<nav aria-label="Mobile sections">
+			<a href="/pages/about" class="snav-mobile-toplink">About</a>
+			<a href="/newsletter" class="snav-mobile-toplink">Newsletters</a>
 			<a href="/video" class="snav-mobile-toplink snav-mobile-live">
 				<span class="snav-live-dot" aria-hidden="true"></span>Live TV
 			</a>
@@ -225,6 +227,7 @@ const UTILITY_LINKS = [
 				))
 			}
 			<div class="snav-mobile-mega">
+				<h2 class="snav-mobile-more-heading">More</h2>
 				{
 					MEGA_COLUMNS.map((col) => (
 						<div class="snav-mobile-megacol">
@@ -241,10 +244,10 @@ const UTILITY_LINKS = [
 				}
 			</div>
 			<div class="snav-mobile-actions">
-				<a href="/_emdash/admin" class="snav-signin"
+				<a href="/sign-in" class="snav-signin"
 					>{isLoggedIn ? "Admin" : "Sign In"}</a
 				>
-				<a href="/pages/about" class="snav-subscribe">Subscribe</a>
+				<a href="/newsletter" class="snav-subscribe">Subscribe</a>
 			</div>
 		</nav>
 	</div>
@@ -634,7 +637,7 @@ const UTILITY_LINKS = [
 		margin-left: auto;
 	}
 	.snav-mega {
-		position: absolute;
+		position: fixed;
 		top: 100%;
 		right: 0;
 		width: min(880px, calc(100vw - var(--spacing-8)));
@@ -819,6 +822,14 @@ const UTILITY_LINKS = [
 		margin-top: var(--spacing-3);
 		border-top: 1px solid var(--color-border);
 	}
+	.snav-mobile-more-heading {
+		grid-column: 1 / -1;
+		font-family: var(--font-sans);
+		font-size: var(--font-size-base);
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0;
+	}
 	.snav-mobile-megacol h3 {
 		font-size: var(--font-size-xs);
 		font-weight: 700;
@@ -867,13 +878,30 @@ const UTILITY_LINKS = [
 	@media (max-width: 900px) {
 		.snav-burger {
 			display: flex;
+			flex: 0 0 36px;
+			color: #fff;
+			position: relative;
+			z-index: 1;
 		}
 		.snav-wordmark {
 			font-size: 1.4rem;
 			margin-right: 0;
+			min-width: 0;
+			flex: 1;
+		}
+		.snav-logo-img {
+			max-width: 100%;
+			height: 34px;
+			object-fit: contain;
+			object-position: left center;
 		}
 		.snav-masthead-inner {
 			gap: var(--spacing-3);
+			padding: var(--spacing-3) var(--spacing-4);
+		}
+		.snav-actions {
+			flex: 0 0 auto;
+			gap: var(--spacing-2);
 		}
 		.snav-search {
 			display: none;
@@ -891,7 +919,11 @@ const UTILITY_LINKS = [
 			grid-template-columns: 1fr;
 		}
 		.snav-subscribe {
-			padding: 6px 12px;
+			display: none;
+		}
+		.snav-mobile-actions .snav-subscribe,
+		.snav-mobile-actions .snav-signin {
+			display: inline-flex;
 		}
 	}
 </style>
@@ -932,7 +964,10 @@ const UTILITY_LINKS = [
 				clearTimeout(hideTimer);
 				const rect = item.getBoundingClientRect();
 				activePanel.style.top = rect.bottom + 'px';
-				activePanel.style.left = rect.left + 'px';
+				const panelWidth = activePanel.classList.contains("snav-mega")
+					? Math.min(880, window.innerWidth - 32)
+					: activePanel.getBoundingClientRect().width;
+				activePanel.style.left = Math.max(16, Math.min(rect.left, window.innerWidth - panelWidth - 16)) + 'px';
 				closeAll(item);
 				activePanel.classList.add("is-open");
 				activeTrigger.setAttribute("aria-expanded", "true");

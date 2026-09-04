@@ -1,0 +1,47 @@
+---
+import Base from "./Base.astro";
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Base title={title} description={description}>
+	<article class="info-page">
+		<p class="info-kicker">The Sustainomics</p>
+		<h1>{title}</h1>
+		<p class="info-description">{description}</p>
+		<slot />
+	</article>
+</Base>
+
+<style>
+	.info-page {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: var(--spacing-12) var(--spacing-6) var(--spacing-20);
+	}
+	.info-kicker {
+		font-size: var(--font-size-xs);
+		font-weight: 700;
+		letter-spacing: var(--tracking-wider);
+		text-transform: uppercase;
+		color: var(--color-kicker);
+	}
+	h1 {
+		font-size: clamp(2rem, 5vw, 3.5rem);
+		margin: var(--spacing-2) 0 var(--spacing-5);
+	}
+	.info-description,
+	.info-page :global(p) {
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-lg);
+		line-height: 1.7;
+	}
+	.info-page :global(a) {
+		font-weight: 600;
+	}
+</style>

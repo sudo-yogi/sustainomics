@@ -35,6 +35,29 @@
 	--wide-width: 1280px;
 }
 
+html,
+body {
+	max-width: 100%;
+	overflow-x: clip;
+}
+
+main,
+main > * {
+	min-width: 0;
+}
+
+@media (max-width: 640px) {
+	:root {
+		--spacing-20: 4rem;
+	}
+
+	main :is(h1, h2, h3, h4),
+	main p,
+	main a {
+		overflow-wrap: anywhere;
+	}
+}
+
 /* Serif headlines in the content area — Bloomberg-style. */
 main :is(h1, h2, h3, h4) {
 	font-family: var(--font-serif, Georgia, "Times New Roman", serif);

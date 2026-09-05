@@ -730,11 +730,19 @@ const UTILITY_LINKS = [
 
 	/* ---------- Mobile menu ---------- */
 	.snav-mobile {
+		position: fixed;
+		top: var(--snav-mobile-top, 60px);
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 99;
 		background: var(--color-bg);
 		color: var(--color-text);
 		border-top: 1px solid var(--color-border);
-		max-height: calc(100vh - 64px);
+		max-height: none;
 		overflow-y: auto;
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
 		padding: var(--spacing-4) var(--spacing-5) var(--spacing-8);
 	}
 	.snav-mobile[hidden] {
@@ -903,9 +911,6 @@ const UTILITY_LINKS = [
 			flex: 0 0 auto;
 			gap: var(--spacing-2);
 		}
-		.snav-search {
-			display: none;
-		}
 		.snav-signin {
 			display: none;
 		}
@@ -924,6 +929,21 @@ const UTILITY_LINKS = [
 		.snav-mobile-actions .snav-subscribe,
 		.snav-mobile-actions .snav-signin {
 			display: inline-flex;
+		}
+	}
+</style>
+
+<style is:global>
+	@media (max-width: 900px) {
+		emdash-live-search.snav-search,
+		.snav-search {
+			display: none !important;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.snav-masthead .snav-actions {
+			display: none;
 		}
 	}
 </style>
@@ -1029,13 +1049,22 @@ const UTILITY_LINKS = [
 		const burger = root.querySelector<HTMLElement>("[data-snav-burger]");
 		const mobile = root.querySelector<HTMLElement>("[data-snav-mobile]");
 		if (burger && mobile) {
+			const positionMobileMenu = () => {
+				const masthead = root.querySelector<HTMLElement>(".snav-masthead");
+				if (masthead) {
+					root.style.setProperty("--snav-mobile-top", `${masthead.getBoundingClientRect().bottom}px`);
+				}
+			};
+
 			burger.addEventListener("click", () => {
 				const open = burger.getAttribute("aria-expanded") === "true";
+				if (!open) positionMobileMenu();
 				burger.setAttribute("aria-expanded", String(!open));
 				burger.setAttribute("aria-label", open ? "Open menu" : "Close menu");
 				mobile.hidden = open;
-				document.body.style.overflow = open ? "" : "hidden";
 			});
+
+			window.addEventListener("orientationchange", positionMobileMenu);
 		}
 
 		/* ---- Mobile accordion ---- */
@@ -1055,7 +1084,6 @@ const UTILITY_LINKS = [
 			if (isDesktop() && mobile && !mobile.hidden) {
 				mobile.hidden = true;
 				burger?.setAttribute("aria-expanded", "false");
-				document.body.style.overflow = "";
 			}
 		});
 	})();

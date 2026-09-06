@@ -12,11 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # gcpit-tech/sustainomics is the only deployer: it alone holds the
-    # RAILWAY_TOKEN secret. The mirror remote (yogi100x/sustainomics) runs the
-    # same workflow, so skip there instead of failing on a missing secret and
-    # instead of racing two builds into the same Railway project.
-    if: github.repository == 'gcpit-tech/sustainomics'
+    if: github.repository == 'sudo-yogi/sustainomics'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,27 +20,28 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      # Project token (RAILWAY_TOKEN) scopes deploy to this project/environment.
-      # Create via GraphQL projectTokenCreate or dashboard → Project → Settings → Tokens.
-      # Add as GitHub secret RAILWAY_TOKEN on gcpit-tech/sustainomics.
       - name: Deploy
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "${RAILWAY_TOKEN:-}" ]; then
-            echo "Missing secret RAILWAY_TOKEN (Railway project token for production)."
+          if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
+            echo "Missing secret RAILWAY_TOKEN."
             exit 1
           fi
-          # Project token already identifies project + environment; pin the service.
-          railway up --service web --ci --message "gha ${GITHUB_SHA::7}"
+          railway up \
+            --service web \
+            --environment production \
+            --project c44febb1-a9ae-4984-bd54-4817e910c186 \
+            --ci \
+            --message "gha ${GITHUB_SHA::7}"
 
       - name: Smoke test public site
         env:
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
           set -euo pipefail
-          SITE_URL="${SITE_URL:-https://web-production-e769d.up.railway.app}"
+          SITE_URL="${SITE_URL:-https://thesustainomics.com}"
           echo "Waiting for $SITE_URL ..."
           OK=""
           for i in $(seq 1 30); do

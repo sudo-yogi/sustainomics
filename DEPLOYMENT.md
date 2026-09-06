@@ -7,9 +7,9 @@
 - **Volume** mounted at `/data` for SQLite + uploads (persists across deploys)
 - **CI/CD:** GitHub Actions deploys on every push to `main` via Railway CLI
 
-Live URL (Railway default domain):
+Live URL: https://thesustainomics.com
 
-https://web-production-e769d.up.railway.app
+Railway default domain (still active): https://web-production-e769d.up.railway.app
 
 ## First-time setup (already done once)
 
@@ -39,7 +39,7 @@ Set on the Railway service (`railway variable set` or dashboard):
 | Variable | Purpose |
 |----------|---------|
 | `EMDASH_ENCRYPTION_KEY` | Stable CMS encryption secret. Generate once; never rotate casually. |
-| `EMDASH_SITE_URL` | Public origin, e.g. `https://web-production-e769d.up.railway.app` |
+| `EMDASH_SITE_URL` | Public origin, currently `https://thesustainomics.com` |
 | `ORIGIN` | Same as `EMDASH_SITE_URL` — baked into Astro `site` at **build** time |
 | `DATABASE_URL` | `file:/data/data.db` |
 | `UPLOADS_DIR` | `/data/uploads` |
@@ -70,61 +70,33 @@ On every push to `main` (and manual `workflow_dispatch`):
 
 | Secret | Value |
 |--------|-------|
-| `RAILWAY_TOKEN` | Railway **project token** (scoped to `sustainomics` / `production`) |
+| `RAILWAY_TOKEN` | Railway **workspace API token** for the `gcpit.tech@gmail.com` workspace that owns project `sustainomics` |
 
-There is **no** `railway token create` CLI command. Create a project token either:
+The workflow already has this secret on `sudo-yogi/sustainomics`. GitHub stores it as `RAILWAY_TOKEN`; the job maps it to `RAILWAY_API_TOKEN` because this is a workspace token, not a project token.
 
-**A. Dashboard** — project **Settings → Tokens** → create for `production`
+To rotate it:
 
-**B. GraphQL** (using a workspace/account API token as `Authorization: Bearer …`):
-
-```bash
-# 1) Workspace/account token from https://railway.com/account/tokens
-#    (or GraphQL apiTokenCreate with workspaceId)
-export RAILWAY_API_TOKEN=…
-
-# 2) Mint project token
-curl -sS https://backboard.railway.com/graphql/v2 \
-  -H "Authorization: Bearer $RAILWAY_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "mutation($input: ProjectTokenCreateInput!) { projectTokenCreate(input: $input) }",
-    "variables": {
-      "input": {
-        "projectId": "c44febb1-a9ae-4984-bd54-4817e910c186",
-        "environmentId": "6befd91b-01bc-4cea-a3af-e1e511efd8cf",
-        "name": "github-actions-ci"
-      }
-    }
-  }'
-```
-
-Then add it to GitHub:
+1. Create a workspace token at https://railway.com/account/tokens (or GraphQL `apiTokenCreate` with workspaceId `d3e8caed-0ddd-4c34-9d59-242044f38ddc`)
+2. Store it on GitHub:
 
 ```bash
-# once you have write access on the repo:
-gh secret set RAILWAY_TOKEN --repo gcpit-tech/sustainomics < path/to/token-file
+gh secret set RAILWAY_TOKEN --repo sudo-yogi/sustainomics
 ```
+
+The workflow pins `--project c44febb1-a9ae-4984-bd54-4817e910c186 --environment production --service web` so the token only deploys this project.
 
 Optional repository variable:
 
 | Variable | Value |
 |----------|-------|
-| `SITE_URL` | `https://web-production-e769d.up.railway.app` |
+| `SITE_URL` | `https://thesustainomics.com` |
 
 ### Alternative: Railway GitHub App (native autodeploy)
 
-If you prefer Railway to deploy on push without Actions:
-
-1. Railway dashboard → service **web** → **Settings → Source**
-2. Connect `gcpit-tech/sustainomics` (branch `main`)
-3. Grant the [Railway GitHub App](https://github.com/settings/installations) access to the `gcpit-tech` org
-4. Optionally enable **Wait for CI** if you keep a test workflow
-
-CLI equivalent (once the GitHub App can see the repo):
+The Railway GitHub App currently cannot see `sudo-yogi/sustainomics`, so deploys go through Actions instead of `railway service source connect`. If you later grant the [Railway GitHub App](https://github.com/settings/installations) access to that org:
 
 ```bash
-railway service source connect --repo gcpit-tech/sustainomics --branch main --service web
+railway service source connect --repo sudo-yogi/sustainomics --branch main --service web
 ```
 
 ## Config as code
@@ -166,7 +138,7 @@ On first start the container entrypoint:
 
 Then create the admin account at:
 
-https://web-production-e769d.up.railway.app/_emdash/admin/setup
+https://thesustainomics.com/_emdash/admin/setup
 
 ## Custom domain
 

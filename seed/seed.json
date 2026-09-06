@@ -1671,7 +1671,9 @@
 						"filename": "sustainomics-quarterly-q2-2026.pdf",
 						"mimeType": "application/pdf",
 						"alt": "The Sustainomics Quarterly Q2 2026",
-						"meta": {}
+						"meta": {
+							"storageKey": "01KV6HDPZXGX53YTB2P4H8KX1X.pdf"
+						}
 					},
 					"issue_date": "2026-06-01T00:00:00Z",
 					"excerpt": "Our Q2 2026 issue examines how sovereign wealth funds are reshaping grid infrastructure investment, the maturation of carbon markets, and the pragmatic new era of ESG finance."

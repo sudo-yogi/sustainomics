@@ -113,10 +113,12 @@ const UTILITY_LINKS = [
 											<a
 												role="menuitem"
 												href={
-													section.kind === "category"
-														? `${section.href}?topic=${st.slug}`
-														: section.slug === "video"
-															? `${section.href}?cat=${encodeURIComponent(st.label)}`
+											section.kind === "category"
+												? `${section.href}?topic=${st.slug}`
+												: section.slug === "video"
+													? `${section.href}?cat=${encodeURIComponent(st.label)}`
+													: section.slug === "opinion"
+														? `${section.href}?series=${st.slug}`
 														: section.href
 												}
 											>
@@ -205,10 +207,12 @@ const UTILITY_LINKS = [
 									<li>
 										<a
 											href={
-												section.kind === "category"
-													? `${section.href}?topic=${st.slug}`
-													: section.slug === "video"
-														? `${section.href}?cat=${encodeURIComponent(st.label)}`
+										section.kind === "category"
+											? `${section.href}?topic=${st.slug}`
+											: section.slug === "video"
+												? `${section.href}?cat=${encodeURIComponent(st.label)}`
+												: section.slug === "opinion"
+													? `${section.href}?series=${st.slug}`
 													: section.href
 											}
 										>

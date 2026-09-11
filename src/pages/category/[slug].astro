@@ -17,7 +17,11 @@ if (!section || section.kind !== "category") {
 	return Astro.redirect("/404");
 }
 
-const topic = Astro.url.searchParams.get("topic");
+const requestedTopic = Astro.url.searchParams.get("topic");
+const topic = requestedTopic && section.subtabs.some((item) => item.slug === requestedTopic)
+	? requestedTopic
+	: null;
+if (requestedTopic && !topic) return Astro.redirect(section.href);
 
 const { entries: posts, cacheHint } = await getEmDashCollection("posts", {
 	where: { category: section.slug },

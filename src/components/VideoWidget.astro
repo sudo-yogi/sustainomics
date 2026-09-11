@@ -1,17 +1,13 @@
 ---
 import { getEmDashCollection } from "emdash";
 import { Image } from "emdash/ui";
+import { getYouTubeId } from "../utils/youtube";
 
 const { entries: videos } = await getEmDashCollection("videos", {
 	orderBy: { video_date: "desc" },
 	limit: 3,
 });
 
-function ytId(u?: string | null) {
-	if (!u) return null;
-	const m = u.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([-\w]{11})/);
-	return m ? m[1] : null;
-}
 ---
 
 {videos.length > 0 && (
@@ -23,11 +19,11 @@ function ytId(u?: string | null) {
 
 		<div class="vid-carousel">
 			{videos.map((ep, i) => {
-				const vid = ytId(ep.data.video_url);
-				const href = vid ? `https://www.youtube.com/watch?v=${vid}` : "/video";
+				const vid = getYouTubeId(ep.data.video_url);
+				const href = `/video/${ep.id}`;
 				return (
 					<div class:list={["vid-slide", { "vid-slide--hidden": i !== 0 }]} data-vidslide={i}>
-						<a href={href} class="vid-link" {...(vid ? { target: "_blank", rel: "noopener" } : {})}>
+						<a href={href} class="vid-link">
 							<div class="vid-thumb">
 								{ep.data.thumbnail ? (
 									<Image image={ep.data.thumbnail} />

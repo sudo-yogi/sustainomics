@@ -14,7 +14,7 @@ import { SECTIONS } from "../config/site-nav";
 
 const POSTS_LIMIT = 16;
 
-const [{ entries: posts, cacheHint }, settings] = await Promise.all([
+const [{ entries: posts, cacheHint: postsCacheHint }, settings] = await Promise.all([
 	getEmDashCollection("posts", {
 		orderBy: { published_at: "desc" },
 		limit: POSTS_LIMIT + 1,
@@ -22,7 +22,6 @@ const [{ entries: posts, cacheHint }, settings] = await Promise.all([
 	getSiteSettings(),
 ]);
 const { siteTitle, siteTagline } = resolveBlogSiteIdentity(settings);
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 
 const visible = posts.slice(0, POSTS_LIMIT);
 const ids = visible.map((p) => p.data.id);
@@ -57,15 +56,28 @@ function initials(name: string) {
 }
 
 // Split opinion out so it gets its own dedicated module.
-const isOpinion = (p: (typeof visible)[number]) => cat(p)?.slug === "opinion";
+const isOpinion = (p: (typeof visible)[number]) =>
+	(catsByEntry.get(p.data.id) ?? []).some((term) => term.slug === "opinion");
 const news = visible.filter((p) => !isOpinion(p));
 const opinion = visible.filter(isOpinion);
 
-const lead = news[0];
-const subHeadlines = news.slice(1, 4);
-const feature = news[4];
-const twoUp = news.slice(5, 7);
-const moreRow = news.slice(7, 10);
+const slot = (name: string) => news.filter((post) => post.data.homepage_slot === name);
+const selected = new Set<string>();
+const take = (preferred: typeof news, fallback: typeof news, count: number) => {
+	const result: typeof news = [];
+	for (const post of [...preferred, ...fallback]) {
+		if (result.length >= count) break;
+		if (selected.has(post.id) || post.data.homepage_slot === "hidden") continue;
+		selected.add(post.id);
+		result.push(post);
+	}
+	return result;
+};
+const lead = take(slot("lead"), news, 1)[0];
+const subHeadlines = take(slot("secondary"), news, 3);
+const feature = take(slot("feature"), news, 1)[0];
+const twoUp = take(slot("standard"), news, 2);
+const moreRow = take(slot("standard"), news, 3);
 
 const opLead = opinion[0];
 const opRest = opinion.slice(1, 4);
@@ -78,11 +90,21 @@ const featureBy = feature ? bylineNames(feature) : [];
 const opLeadBy = opLead ? leadByline(opLead) : null;
 
 // Homepage modules pulling from the Video + Magazine collections.
-const [{ entries: videos }, { entries: mags }, { entries: bandPostsRaw }] = await Promise.all([
+const [videosResult, magsResult, bandPostsResult] = await Promise.all([
 	getEmDashCollection("videos", { orderBy: { video_date: "desc" }, limit: 8 }),
 	getEmDashCollection("magazines", { limit: 6 }),
 	getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 80 }),
 ]);
+const { entries: videos } = videosResult;
+const { entries: mags } = magsResult;
+const { entries: bandPostsRaw } = bandPostsResult;
+if (Astro.cache?.enabled) {
+	const hints = [postsCacheHint, videosResult.cacheHint, magsResult.cacheHint, bandPostsResult.cacheHint];
+	Astro.cache.set({
+		tags: [...new Set(hints.flatMap((hint) => hint.tags ?? []))],
+		lastModified: hints.map((hint) => hint.lastModified).filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0],
+	});
+}
 
 // Group top 3 posts per news section for category bands
 const NEWS_SECTIONS = SECTIONS.filter((s) => s.kind === "category");
@@ -90,6 +112,7 @@ const bandIds = bandPostsRaw.map((p) => p.data.id);
 const bandCats = await getTermsForEntries("posts", bandIds, "category");
 const postsBySection: Record<string, typeof bandPostsRaw> = {};
 for (const post of bandPostsRaw) {
+	if (selected.has(post.id) || post.data.homepage_slot === "hidden") continue;
 	const cats = bandCats.get(post.data.id) ?? [];
 	for (const c of cats) {
 		if (!postsBySection[c.slug]) postsBySection[c.slug] = [];
@@ -218,7 +241,7 @@ function ytId(u?: string | null) {
 						{/* ===== Opinion (shaded block) ===== */}
 						{opinion.length > 0 && (
 							<section class="opinion">
-								<a class="op-kicker" href="/category/opinion">
+								<a class="op-kicker" href="/opinion">
 									THE SUSTAINOMICS Opinion
 								</a>
 								<div class="op-grid">

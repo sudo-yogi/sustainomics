@@ -268,6 +268,16 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "text"
+				},
+				{
+					"slug": "opinion_series",
+					"label": "Opinion Series Slug (for Opinion posts)",
+					"type": "string"
+				},
+				{
+					"slug": "homepage_slot",
+					"label": "Homepage Slot: lead | feature | secondary | standard | hidden",
+					"type": "string"
 				}
 			]
 		}

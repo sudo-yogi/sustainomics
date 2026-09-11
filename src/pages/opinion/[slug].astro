@@ -3,6 +3,6 @@ import { getEmDashEntry } from "emdash";
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect("/404");
-const { entry } = await getEmDashEntry("articles", slug);
-return Astro.redirect(entry ? `/articles/${slug}` : "/404", 301);
+const { entry } = await getEmDashEntry("posts", slug);
+return Astro.redirect(entry ? `/posts/${slug}` : "/404", 301);
 ---

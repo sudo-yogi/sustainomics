@@ -4,6 +4,7 @@ import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
 import { getSection } from "../../config/site-nav";
+import { getYouTubeId } from "../../utils/youtube";
 
 const section = getSection("video")!;
 const CATEGORIES = section.subtabs;
@@ -15,23 +16,12 @@ const { entries: videos, cacheHint } = await getEmDashCollection("videos", {
 });
 if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 
-function ytId(u?: string | null) {
-	if (!u) return null;
-	const m = u.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([-\w]{11})/);
-	return m ? m[1] : null;
-}
-
-function ytUrl(id: string) {
-	return `https://www.youtube.com/watch?v=${id}`;
-}
-
 function hrefFor(video: (typeof videos)[number]) {
-	const vid = ytId(video.data.video_url);
-	return vid ? ytUrl(vid) : `/video/${video.id}`;
+	return `/video/${video.id}`;
 }
 
 function thumb(video: (typeof videos)[number]) {
-	const vid = ytId(video.data.video_url);
+	const vid = getYouTubeId(video.data.video_url);
 	return vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : null;
 }
 
@@ -91,7 +81,7 @@ for (const video of videos) {
 				{/* ===== FEATURED STRIP (latest 3) ===== */}
 				<section class="featured-strip">
 					{featured.map((video, i) => {
-						const vid = ytId(video.data.video_url);
+						const vid = getYouTubeId(video.data.video_url);
 						const t = thumb(video);
 						return (
 							<a
@@ -142,7 +132,7 @@ for (const video of videos) {
 							) : (
 								<div class="show-grid">
 									{categoryVideos.map((video) => {
-										const vid = ytId(video.data.video_url);
+									const vid = getYouTubeId(video.data.video_url);
 										const t = thumb(video);
 										return (
 											<a

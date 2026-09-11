@@ -4,6 +4,7 @@ import auditLog from "@emdash-cms/plugin-audit-log";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash, { local } from "emdash/astro";
 import { sqlite } from "emdash/db";
+import { embedsPlugin } from "./src/plugins/embeds/index.ts";
 
 export default defineConfig({
 	site: process.env.ORIGIN || "http://localhost:4321",
@@ -24,7 +25,7 @@ export default defineConfig({
 				directory: process.env.UPLOADS_DIR || "./uploads",
 				baseUrl: "/_emdash/api/media/file",
 			}),
-			plugins: [auditLog],
+			plugins: [auditLog, embedsPlugin()],
 		}),
 	],
 	fonts: [

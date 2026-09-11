@@ -9,8 +9,12 @@ const uploadsDir = process.env.UPLOADS_DIR || path.join(root, "uploads");
 const seed = JSON.parse(fs.readFileSync(path.join(root, "seed/seed.json"), "utf8"));
 const db = new Database(databasePath);
 
-const media = new Map();
+const seedMedia = new Map();
 const files = fs.existsSync(uploadsDir) ? fs.readdirSync(uploadsDir) : [];
+
+function storedFileExists(storageKey) {
+	return typeof storageKey === "string" && storageKey.length > 0 && fs.existsSync(path.join(uploadsDir, storageKey));
+}
 
 function storageKeyFor(value) {
 	const explicit = value?.meta?.storageKey;
@@ -36,7 +40,7 @@ function walk(value) {
 
 	if (typeof value.id === "string" && value.provider === "local" && value.filename) {
 		const storageKey = storageKeyFor(value);
-		if (storageKey) media.set(value.id, { ...value, storageKey });
+		if (storageKey) seedMedia.set(value.id, { ...value, storageKey });
 	}
 
 	Object.values(value).forEach(walk);
@@ -44,30 +48,59 @@ function walk(value) {
 
 walk(seed);
 
-const insert = db.prepare(`
+const getExistingMedia = db.prepare(`
+	SELECT storage_key
+	FROM media
+	WHERE id = ?
+`);
+const insertMedia = db.prepare(`
 	INSERT INTO media (id, filename, mime_type, size, storage_key, status)
 	VALUES (?, ?, ?, ?, ?, 'ready')
-	ON CONFLICT(id) DO UPDATE SET
-		filename = excluded.filename,
-		mime_type = excluded.mime_type,
-		size = excluded.size,
-		storage_key = excluded.storage_key,
-		status = 'ready'
+	ON CONFLICT(id) DO NOTHING
+`);
+const repairMissingMedia = db.prepare(`
+	UPDATE media
+	SET filename = ?, mime_type = ?, size = ?, storage_key = ?, status = 'ready'
+	WHERE id = ?
 `);
 
-let registered = 0;
+const resolvedStorageKeys = new Map();
+let inserted = 0;
+let repairedMedia = 0;
+let preservedMedia = 0;
 db.transaction(() => {
-	for (const item of media.values()) {
+	for (const item of seedMedia.values()) {
 		const filePath = path.join(uploadsDir, item.storageKey);
 		if (!fs.existsSync(filePath)) continue;
-		insert.run(
-			item.id,
-			item.filename,
-			item.mimeType || "application/octet-stream",
-			fs.statSync(filePath).size,
-			item.storageKey,
-		);
-		registered++;
+
+		const existing = getExistingMedia.get(item.id);
+		if (existing && storedFileExists(existing.storage_key)) {
+			resolvedStorageKeys.set(item.id, existing.storage_key);
+			preservedMedia++;
+			continue;
+		}
+
+		const size = fs.statSync(filePath).size;
+		if (existing) {
+			repairMissingMedia.run(
+				item.filename,
+				item.mimeType || "application/octet-stream",
+				size,
+				item.storageKey,
+				item.id,
+			);
+			repairedMedia++;
+		} else {
+			insertMedia.run(
+				item.id,
+				item.filename,
+				item.mimeType || "application/octet-stream",
+				size,
+				item.storageKey,
+			);
+			inserted++;
+		}
+		resolvedStorageKeys.set(item.id, item.storageKey);
 	}
 })();
 
@@ -92,8 +125,9 @@ function repairValue(value) {
 	}
 
 	if (typeof value.id === "string" && value.provider === "local") {
-		const storageKey = media.get(value.id)?.storageKey;
-		if (storageKey && value.meta?.storageKey !== storageKey) {
+		const currentStorageKey = value.meta?.storageKey;
+		const storageKey = resolvedStorageKeys.get(value.id);
+		if (!storedFileExists(currentStorageKey) && storageKey && currentStorageKey !== storageKey) {
 			next.meta = { ...(value.meta || {}), storageKey };
 			changed = true;
 		}
@@ -126,4 +160,6 @@ db.transaction(() => {
 	}
 })();
 
-console.log(`Registered ${registered} bundled media files and repaired ${repairedReferences} content references.`);
+console.log(
+	`Seed media: inserted ${inserted}, repaired ${repairedMedia} missing, preserved ${preservedMedia}; repaired ${repairedReferences} missing content references.`,
+);

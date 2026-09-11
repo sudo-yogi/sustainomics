@@ -137,12 +137,16 @@ function ytId(u?: string | null) {
 
 <Base title={siteTitle} description={siteTagline}>
 	{
-		visible.length === 0 ? (
+		!lead ? (
 			<section class="empty-state">
-				<h2>No articles yet</h2>
-				<p>Create your first article in the admin panel.</p>
-				<a href="/_emdash/admin/content/posts/new" class="btn">
-					Create an article
+				<h2>{visible.length === 0 ? "No articles yet" : "No homepage articles available"}</h2>
+				<p>
+					{visible.length === 0
+						? "Create your first article in the admin panel."
+						: "All eligible articles are hidden from the homepage. Update a post's Homepage Slot to show it here."}
+				</p>
+				<a href={visible.length === 0 ? "/_emdash/admin/content/posts/new" : "/_emdash/admin/content/posts"} class="btn">
+					{visible.length === 0 ? "Create an article" : "Manage homepage articles"}
 				</a>
 			</section>
 		) : (
@@ -362,7 +366,7 @@ function ytId(u?: string | null) {
 									</div>
 									<div class="orig-grid">
 										{originals.map((e) => (
-											<a class="orig-card" href="/video">
+											<a class="orig-card" href={`/video/${e.id}`}>
 												<div class="orig-thumb">
 													{e.data.thumbnail ? (
 														<Image image={e.data.thumbnail} />

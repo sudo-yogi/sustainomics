@@ -81,12 +81,10 @@ for (const video of videos) {
 				{/* ===== FEATURED STRIP (latest 3) ===== */}
 				<section class="featured-strip">
 					{featured.map((video, i) => {
-						const vid = getYouTubeId(video.data.video_url);
 						const t = thumb(video);
 						return (
 							<a
 								href={hrefFor(video)}
-								{...(vid ? { "data-video-id": vid, "data-video-title": video.data.title } : {})}
 								class:list={["feat-card", { "feat-card--lead": i === 0 }]}
 							>
 								<div class="feat-media">
@@ -132,12 +130,10 @@ for (const video of videos) {
 							) : (
 								<div class="show-grid">
 									{categoryVideos.map((video) => {
-									const vid = getYouTubeId(video.data.video_url);
 										const t = thumb(video);
 										return (
 											<a
 												href={hrefFor(video)}
-												{...(vid ? { "data-video-id": vid, "data-video-title": video.data.title } : {})}
 												class="ep-card"
 											>
 												<div class="ep-media">
@@ -169,54 +165,6 @@ for (const video of videos) {
 			</>
 		)}
 	</div>
-
-	<div class="video-lightbox" id="video-lightbox" hidden>
-		<div class="video-lightbox-backdrop" data-close></div>
-		<div class="video-lightbox-inner">
-			<button type="button" class="video-lightbox-close" data-close aria-label="Close video">✕</button>
-			<div class="video-lightbox-frame" id="video-lightbox-frame"></div>
-		</div>
-	</div>
-
-	<script>
-		const lightbox = document.getElementById("video-lightbox");
-		const frame = document.getElementById("video-lightbox-frame");
-
-		function openVideo(id: string, title: string) {
-			if (!lightbox || !frame) return;
-			frame.innerHTML = "";
-			const iframe = document.createElement("iframe");
-			iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1`;
-			iframe.title = title || "Video player";
-			iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-			iframe.allowFullscreen = true;
-			frame.appendChild(iframe);
-			lightbox.hidden = false;
-			document.body.style.overflow = "hidden";
-		}
-
-		function closeVideo() {
-			if (!lightbox || !frame) return;
-			lightbox.hidden = true;
-			frame.innerHTML = "";
-			document.body.style.overflow = "";
-		}
-
-		document.addEventListener("click", (e) => {
-			const target = e.target as HTMLElement;
-			const link = target.closest<HTMLElement>("a[data-video-id]");
-			if (link) {
-				e.preventDefault();
-				openVideo(link.dataset.videoId!, link.dataset.videoTitle ?? "");
-				return;
-			}
-			if (target.closest("[data-close]")) closeVideo();
-		});
-
-		document.addEventListener("keydown", (e) => {
-			if (e.key === "Escape" && lightbox && !lightbox.hidden) closeVideo();
-		});
-	</script>
 </Base>
 
 <style>
@@ -467,61 +415,5 @@ for (const video of videos) {
 	@media (max-width: 600px) {
 		.featured-strip { grid-template-columns: 1fr; }
 		.show-grid { grid-template-columns: 1fr; }
-	}
-
-	.video-lightbox {
-		position: fixed;
-		inset: 0;
-		z-index: 2000;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: var(--spacing-6);
-	}
-	/* The class's `display: flex` outranks the UA `[hidden]{display:none}`
-	   rule, so without this the overlay shows on load and blocks the page. */
-	.video-lightbox[hidden] {
-		display: none;
-	}
-	.video-lightbox-backdrop {
-		position: absolute;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.85);
-	}
-	.video-lightbox-inner {
-		position: relative;
-		width: min(1100px, 100%);
-	}
-	.video-lightbox-close {
-		position: absolute;
-		top: var(--spacing-3);
-		right: var(--spacing-3);
-		z-index: 2;
-		background: rgba(0, 0, 0, 0.65);
-		border: none;
-		border-radius: 50%;
-		width: 36px;
-		height: 36px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #fff;
-		font-size: 1.25rem;
-		line-height: 1;
-		cursor: pointer;
-		padding: 0;
-	}
-	.video-lightbox-frame {
-		position: relative;
-		width: 100%;
-		aspect-ratio: 16 / 9;
-		background: #000;
-	}
-	.video-lightbox-frame :global(iframe) {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		border: 0;
 	}
 </style>

@@ -243,4 +243,3 @@ A Byline is the name shown publicly. A User is an account that can sign in to th
 - One Podcast references a missing file: `podcast-sample-15s.mp3`.
 - Audit History is not recording changes because of a plugin capability problem.
 - The project type check currently reports errors that still need to be fixed.
-

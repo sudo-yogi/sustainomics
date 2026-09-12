@@ -19,6 +19,7 @@ import PostCard from "../../components/PostCard.astro";
 import { getReadingTime } from "../../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 import AdBlock from "../../components/AdBlock.astro";
+import { addCacheHint } from "../../utils/cache";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -32,7 +33,7 @@ if (!post) {
 	return Astro.redirect("/404");
 }
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 // Get featured image URL for OG fallback
 // The image may have src (external) or meta.storageKey (local)
@@ -79,10 +80,11 @@ const categories = post.data.terms?.category ?? [];
 const primaryCategory = categories[0] ?? null;
 
 // Fetch a few extra recent posts in case the current post is among them.
-const { entries: recentPosts } = await getEmDashCollection("posts", {
+const { entries: recentPosts, cacheHint: recentCacheHint } = await getEmDashCollection("posts", {
 	orderBy: { published_at: "desc" },
 	limit: 4,
 });
+addCacheHint(Astro, recentCacheHint);
 const otherPosts = recentPosts.filter((p) => p.id !== post.id).slice(0, 3);
 
 // Single batched query for related-posts tags, rather than one

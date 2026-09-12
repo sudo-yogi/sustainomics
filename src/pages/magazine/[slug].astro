@@ -3,13 +3,14 @@ import { getEmDashEntry } from "emdash";
 import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import PdfReader from "../../components/PdfReader.astro";
+import { addCacheHint } from "../../utils/cache";
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect("/404");
 
 const { entry: mag, cacheHint } = await getEmDashEntry("magazines", slug);
 if (!mag) return Astro.redirect("/404");
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 function mediaUrl(v: any): string | null {
 	if (!v) return null;

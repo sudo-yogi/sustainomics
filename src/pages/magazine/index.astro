@@ -4,15 +4,16 @@ import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
 import { SECTIONS } from "../../config/site-nav";
+import { addCacheHint } from "../../utils/cache";
 
 const magSection = SECTIONS.find((s) => s.slug === "magazine")!;
 const MAG_SUBTABS = magSection.subtabs;
 
-const [{ entries: issues, cacheHint }, { entries: articles }] = await Promise.all([
+const [{ entries: issues, cacheHint }, { entries: articles, cacheHint: articlesCacheHint }] = await Promise.all([
 	getEmDashCollection("magazines"),
 	getEmDashCollection("articles", { limit: 80 }),
 ]);
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint, articlesCacheHint);
 
 const toMs = (d: Date | string | null | undefined): number => {
 	if (!d) return 0;

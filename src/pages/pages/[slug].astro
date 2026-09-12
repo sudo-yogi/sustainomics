@@ -2,6 +2,7 @@
 import { getEmDashEntry, decodeSlug } from "emdash";
 import { PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
+import { addCacheHint } from "../../utils/cache";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -15,7 +16,7 @@ if (!page) {
 	return Astro.redirect("/404");
 }
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 ---
 
 <Base

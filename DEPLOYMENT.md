@@ -18,7 +18,15 @@ Railway default domain (still active): https://web-production-e769d.up.railway.a
 3. Public domain generated
 4. Environment variables set (see below)
 
-If you recreate the project from scratch:
+Docker Compose first boot of an empty `cms-data` volume:
+
+```bash
+ALLOW_FRESH_DATABASE=1 docker compose up --build
+# After the site starts, restart without the flag:
+docker compose up -d
+```
+
+If you recreate the Railway project from scratch:
 
 ```bash
 cd sustainomics
@@ -28,9 +36,16 @@ railway add --service web
 railway service link web
 railway volume add --mount-path /data
 railway domain --port 3000
-# set variables (below), then:
+# Set the normal variables below. Then explicitly approve the first seed:
+railway variable set ALLOW_FRESH_DATABASE=1
 railway up --service web
+# After the site starts successfully, immediately restore the safety guard:
+railway variable set ALLOW_FRESH_DATABASE=0
 ```
+
+`ALLOW_FRESH_DATABASE=1` is only for the first start of a new, empty `/data`
+volume. If an existing deployment unexpectedly reports a missing database, do
+not enable it—reattach or restore the production volume instead.
 
 ## Environment variables
 
@@ -46,6 +61,7 @@ Set on the Railway service (`railway variable set` or dashboard):
 | `HOST` | `0.0.0.0` |
 | `PORT` | `3000` |
 | `NODE_ENV` | `production` |
+| `ALLOW_FRESH_DATABASE` | `0` normally. Temporarily set to `1` only for the first intentional bootstrap of an empty volume. |
 
 Generate a new encryption key:
 
@@ -133,10 +149,13 @@ On first start the container entrypoint:
 
 1. Ensures `/data/uploads` exists
 2. Seeds bundled media into the volume
-3. If `/data/data.db` is missing, runs `emdash seed seed/seed.json`
-4. Runs `scripts/setup-magazines.mjs`
+3. Refuses to create a missing production database unless `ALLOW_FRESH_DATABASE=1`
+4. With that one-time approval, creates `/data/data.db` from `seed/seed.json`
+5. On later starts, syncs collection fields without replacing CMS content
+6. Registers missing bundled media and magazine issues
 
-Then create the admin account at:
+After the first successful start, set `ALLOW_FRESH_DATABASE=0`. Then create the
+admin account at:
 
 https://thesustainomics.com/_emdash/admin/setup
 

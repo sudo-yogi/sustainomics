@@ -1,5 +1,6 @@
 ---
 import { getEmDashCollection } from "emdash";
+import { addCacheHint } from "../utils/cache";
 
 interface Props {
 	placement: "sidebar" | "leaderboard" | "mid-page" | "homepage" | "article";
@@ -8,26 +9,27 @@ interface Props {
 
 const { placement, class: className } = Astro.props;
 
-const { entries: allAds } = await getEmDashCollection("advertisements");
+const { entries: allAds, cacheHint } = await getEmDashCollection("advertisements");
+addCacheHint(Astro, cacheHint);
 const allMatching = allAds.filter(
 	(ad) => ad.data.placement?.trim().toLowerCase() === placement
 );
-const ads = placement === "mid-page" ? allMatching.slice(0, 1) : allMatching;
+const ads = allMatching;
 
 function mediaUrl(img: any): string | null {
 	if (!img) return null;
 	if (img?.meta?.storageKey) {
 		return `/_emdash/api/media/file/${img.meta.storageKey}`;
 	}
-	return img?.url ?? null;
+	return img?.src ?? img?.url ?? null;
 }
 
 const BRAND_COLORS = ["#1a6b3c", "#0f4c81", "#8b1a1a", "#5c3d8f", "#b45309"];
 ---
 
 {ads.length > 0 && (
-	<div class={`ad-zone ad-zone--${placement}${className ? ` ${className}` : ""}${placement === 'leaderboard' ? ' ad-zone--rotating' : ''}`}
-		data-rotating={placement === 'leaderboard' ? 'true' : undefined}>
+	<div class={`ad-zone ad-zone--${placement}${className ? ` ${className}` : ""}${ads.length > 1 ? ' ad-zone--rotating' : ''}`}
+		data-rotating={ads.length > 1 ? 'true' : undefined}>
 		{ads.map((ad, i) => {
 			const imgUrl = mediaUrl(ad.data.image);
 			const label = ad.data.sponsor_label || "Advertisement";
@@ -49,7 +51,7 @@ const BRAND_COLORS = ["#1a6b3c", "#0f4c81", "#8b1a1a", "#5c3d8f", "#b45309"];
 			);
 
 				return (
-				<div class="ad-block" data-slide={placement === 'leaderboard' ? String(i) : undefined}>
+				<div class="ad-block" data-slide={ads.length > 1 ? String(i) : undefined}>
 					<p class="ad-label">{label}</p>
 					{ad.data.link_url ? (
 						<a href={ad.data.link_url} target="_blank" rel="noopener sponsored" class="ad-link">

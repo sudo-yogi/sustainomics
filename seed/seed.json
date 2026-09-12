@@ -268,6 +268,16 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "text"
+				},
+				{
+					"slug": "opinion_series",
+					"label": "Opinion Series Slug (for Opinion posts)",
+					"type": "string"
+				},
+				{
+					"slug": "homepage_slot",
+					"label": "Homepage Slot: lead | feature | secondary | standard | hidden",
+					"type": "string"
 				}
 			]
 		}
@@ -1724,7 +1734,7 @@
 				"data": {
 					"title": "The Sustainomics Daily Transition Briefing",
 					"excerpt": "A fast-moving desk briefing on markets, regulation, climate finance, and sustainable growth signals.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "The Sustainomics",
 					"video_date": "2026-06-30T12:00:00Z",
 					"duration": "12:14"
@@ -1763,7 +1773,7 @@
 				"data": {
 					"title": "Enterprise Services in the Low-Carbon Economy",
 					"excerpt": "How advisory, compliance, and platform businesses are reorganising around climate mandates.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Global Business Services",
 					"video_date": "2026-06-27T12:00:00Z",
 					"duration": "18:22"
@@ -1802,7 +1812,7 @@
 				"data": {
 					"title": "Founder Playbook for Climate-Tech Scaleups",
 					"excerpt": "Operators discuss capital discipline, pilot customers, and the hard path from prototype to procurement.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Global Founders",
 					"video_date": "2026-06-24T12:00:00Z",
 					"duration": "26:48"
@@ -1841,7 +1851,7 @@
 				"data": {
 					"title": "Small Business Energy Costs and the Transition",
 					"excerpt": "How small firms are dealing with energy volatility, efficiency investments, and financing gaps.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Global SMBs",
 					"video_date": "2026-06-21T12:00:00Z",
 					"duration": "13:45"
@@ -1880,7 +1890,7 @@
 				"data": {
 					"title": "Diaspora Capital and Green Growth Corridors",
 					"excerpt": "How remittances, founder networks, and investor communities are shaping cross-border growth.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Diaspora Affairs",
 					"video_date": "2026-06-18T12:00:00Z",
 					"duration": "24:15"
@@ -1919,7 +1929,7 @@
 				"data": {
 					"title": "Trade Alliances in the Climate Era",
 					"excerpt": "Why carbon border rules, industrial policy, and trade agreements are converging.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Global Alliances",
 					"video_date": "2026-06-15T12:00:00Z",
 					"duration": "21:06"
@@ -1958,7 +1968,7 @@
 				"data": {
 					"title": "Women Leading Climate Finance",
 					"excerpt": "Senior investors discuss mandate design, risk, and the future of inclusive climate capital.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Women in Lead",
 					"video_date": "2026-06-12T12:00:00Z",
 					"duration": "17:58"
@@ -1997,7 +2007,7 @@
 				"data": {
 					"title": "AI and Energy Demand: What Changes Next",
 					"excerpt": "Analysts debate data centers, grid demand, model efficiency, and the economics of compute.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Tech Horizons",
 					"video_date": "2026-06-09T12:00:00Z",
 					"duration": "16:34"
@@ -2036,7 +2046,7 @@
 				"data": {
 					"title": "Innovation Edge: Battery Materials",
 					"excerpt": "A field report on new chemistries, supply constraints, and recycling economics.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Innovation Edge",
 					"video_date": "2026-06-06T12:00:00Z",
 					"duration": "13:18"
@@ -2075,7 +2085,7 @@
 				"data": {
 					"title": "CEO Roundtable: Transition Strategy",
 					"excerpt": "Executives discuss capital allocation, resilience, reporting, and where boards are pushing hardest.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Executive Suite",
 					"video_date": "2026-06-03T12:00:00Z",
 					"duration": "29:12"
@@ -2114,7 +2124,7 @@
 				"data": {
 					"title": "Deeptech, Defence, and Resilient Supply Chains",
 					"excerpt": "Aerospace and defence analysts discuss strategic autonomy, materials, and dual-use innovation.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Aerospace, Defence & Deeptech",
 					"video_date": "2026-05-31T12:00:00Z",
 					"duration": "24:37"
@@ -2153,7 +2163,7 @@
 				"data": {
 					"title": "Future of Work in the Transition Economy",
 					"excerpt": "HR leaders discuss skills, reskilling, hybrid work, and the green jobs pipeline.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "HRM & Organizational Development",
 					"video_date": "2026-05-28T12:00:00Z",
 					"duration": "20:33"
@@ -2192,7 +2202,7 @@
 				"data": {
 					"title": "Food Systems Under Climate Stress",
 					"excerpt": "Agriculture economists explain crop risk, input costs, water pressure, and nutrition security.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Agriculture, Food & Nutrition",
 					"video_date": "2026-05-25T12:00:00Z",
 					"duration": "23:10"
@@ -2231,7 +2241,7 @@
 				"data": {
 					"title": "Climate Finance Portfolio Construction",
 					"excerpt": "Asset managers discuss diversification, transition risk, and how climate themes enter portfolios.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Investment Insights",
 					"video_date": "2026-05-22T12:00:00Z",
 					"duration": "21:54"
@@ -2270,7 +2280,7 @@
 				"data": {
 					"title": "Cooperatives and Local Transition Finance",
 					"excerpt": "Community finance leaders explain cooperative models for energy, agriculture, and resilience.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"category": "Global Cooperative",
 					"video_date": "2026-05-19T12:00:00Z",
 					"duration": "15:25"
@@ -2329,7 +2339,7 @@
 				"data": {
 					"title": "Carbon Pricing Mechanisms: What Works and What Does Not",
 					"excerpt": "A rigorous look at emissions trading schemes, carbon taxes, and border adjustment mechanisms across the G20.",
-					"video_url": "https://www.youtube.com/watch?v=9GorqroigqM",
+					"video_url": "https://www.youtube.com/watch?v=G4H1N_yXBiA",
 					"episode_date": "2026-04-28T00:00:00Z",
 					"duration": "21:40"
 				}
@@ -3631,6 +3641,7 @@
 				"status": "published",
 				"data": {
 					"title": "Carbon Tax or Cap-and-Trade? The Wrong Question Is Killing the Right Policy",
+					"opinion_series": "policy-watch",
 					"featured_image": {
 						"id": "01KV56EV7NH6PC17R4XE4PQGM4",
 						"provider": "local",
@@ -4272,6 +4283,7 @@
 				"status": "published",
 				"data": {
 					"title": "Nuclear Is Non-Negotiable. The Sooner Climate Hawks Accept This, the Better",
+					"opinion_series": "green-economy",
 					"featured_image": {
 						"id": "01KV3TVYFV3HD8MZ94EX4W9YE7",
 						"provider": "local",
@@ -5231,6 +5243,7 @@
 				"status": "published",
 				"data": {
 					"title": "Degrowth vs. Green Growth: A False Dichotomy We Need to Retire",
+					"opinion_series": "the-sustainomics-show",
 					"featured_image": {
 						"id": "01KV3TVYET8Q6PEHJHKYNQV9EP",
 						"provider": "local",
@@ -15141,6 +15154,7 @@
 				"status": "published",
 				"data": {
 					"title": "Why Green Subsidies Need Sunset Clauses",
+					"opinion_series": "capital-chronicles",
 					"content": [
 						{
 							"_type": "block",
@@ -15364,6 +15378,7 @@
 				"status": "published",
 				"data": {
 					"title": "Adaptation Is the Climate Investment We Keep Ignoring",
+					"opinion_series": "esg-watch",
 					"content": [
 						{
 							"_type": "block",
@@ -15587,6 +15602,7 @@
 				"status": "published",
 				"data": {
 					"title": "The Carbon Price Is Finally Doing Its Job",
+					"opinion_series": "market-daily",
 					"featured_image": {
 						"provider": "local",
 						"id": "01KV6H2TR3KJPC7EGR5AX4JMJM",

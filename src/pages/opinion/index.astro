@@ -1,17 +1,24 @@
 ---
-import { getEmDashCollection } from "emdash";
+import { getEmDashCollection, getTermsForEntries } from "emdash";
 import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
 import { getSection } from "../../config/site-nav";
+import { addCacheHint } from "../../utils/cache";
 
 const opinionSection = getSection("opinion")!;
+const requestedSeries = Astro.url.searchParams.get("series");
+const activeSeries = requestedSeries
+	? opinionSection.subtabs.find((show) => show.slug === requestedSeries) ?? null
+	: null;
+if (requestedSeries && !activeSeries) return Astro.redirect("/opinion");
 
-const { entries: articles, cacheHint } = await getEmDashCollection("articles", {
+const { entries: articles, cacheHint } = await getEmDashCollection("posts", {
+	where: { category: "opinion" },
 	orderBy: { published_at: "desc" },
 	limit: 80,
 });
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 const fmt = (d: Date | string | null | undefined) => {
 	if (!d) return null;
@@ -31,35 +38,31 @@ const bylineNames = (article: (typeof articles)[number]) =>
 		.join(", ");
 
 const opinionShows = opinionSection.subtabs;
-const featured = articles.slice(0, 3);
+const termsByEntry = await getTermsForEntries(
+	"posts",
+	articles.map((article) => article.data.id),
+	"tag",
+);
 const sectionLabels = opinionShows.map((show) => show.label);
 const articlesBySection: Record<string, typeof articles> = {};
 for (const label of sectionLabels) articlesBySection[label] = [];
 
 function showForArticle(article: (typeof articles)[number]) {
-	const haystack = [
-		article.data.title,
-		article.data.excerpt,
-		article.data.mag_section,
-	]
-		.filter(Boolean)
-		.join(" ")
-		.toLowerCase();
-
-	return (
-		opinionShows.find((show) =>
-			show.slug
-				.split("-")
-				.filter((word) => word.length > 2)
-				.some((word) => haystack.includes(word))
-		) ?? opinionShows[0]
-	);
+	const explicit = article.data.opinion_series?.trim().toLowerCase();
+	const tags = termsByEntry.get(article.data.id) ?? [];
+	return opinionShows.find((show) => show.slug === explicit || tags.some((tag) => tag.slug === show.slug)) ?? null;
 }
 
 for (const article of articles) {
-	const key = showForArticle(article).label;
-	if (articlesBySection[key].length < 3) articlesBySection[key].push(article);
+	const show = showForArticle(article);
+	if (!show) continue;
+	const key = show.label;
+	articlesBySection[key].push(article);
 }
+const visibleArticles = activeSeries
+	? articles.filter((article) => showForArticle(article)?.slug === activeSeries.slug)
+	: articles;
+const featured = visibleArticles.slice(0, 3);
 ---
 
 <Base title="Opinion" description={opinionSection.blurb}>
@@ -73,16 +76,17 @@ for (const article of articles) {
 
 		{/* ===== SECTION TABS NAV ===== */}
 		<nav class="show-tabs" aria-label="Opinion shows">
-			{sectionLabels.map((label) => (
-				<a href={`#section-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} class="show-tab">{label}</a>
+			<a href="/opinion" class:list={["show-tab", { "show-tab--active": !activeSeries }]}>All</a>
+			{opinionShows.map((show) => (
+				<a href={`/opinion?series=${show.slug}`} class:list={["show-tab", { "show-tab--active": activeSeries?.slug === show.slug }]}>{show.label}</a>
 			))}
 		</nav>
 
-		{articles.length === 0 ? (
+		{visibleArticles.length === 0 ? (
 			<section class="empty">
-				<h2>No articles yet</h2>
-				<p>Publish your first article in the admin panel.</p>
-				<a class="btn" href="/_emdash/admin/content/articles/new">Add an article</a>
+				<h2>{activeSeries ? `No ${activeSeries.label} posts yet` : "No opinion posts yet"}</h2>
+				<p>Publish an Opinion post and assign its Opinion Series Slug in the admin panel.</p>
+				<a class="btn" href="/_emdash/admin/content/posts/new">Add an opinion post</a>
 			</section>
 		) : (
 			<>
@@ -90,7 +94,7 @@ for (const article of articles) {
 				<section class="featured-strip">
 					{featured.map((article, i) => {
 						return (
-							<a href={`/articles/${article.id}`} class:list={["feat-card", { "feat-card--lead": i === 0 }]}>
+							<a href={`/posts/${article.id}`} class:list={["feat-card", { "feat-card--lead": i === 0 }]}>
 								<div class="feat-media">
 									{article.data.featured_image ? (
 										<Image image={article.data.featured_image} />
@@ -99,7 +103,7 @@ for (const article of articles) {
 									)}
 								</div>
 								<div class="feat-body">
-									<span class="feat-kicker">{showForArticle(article).label}</span>
+									<span class="feat-kicker">{showForArticle(article)?.label ?? "Opinion"}</span>
 									<h2 class="feat-title">{article.data.title}</h2>
 									{article.data.excerpt && <p class="feat-dek">{article.data.excerpt}</p>}
 									<div class="feat-meta">
@@ -116,17 +120,21 @@ for (const article of articles) {
 
 				{/* ===== ARTICLE BANDS ===== */}
 				{sectionLabels.map((label) => {
-					const sectionArticles = articlesBySection[label] ?? [];
 					const show = opinionShows.find((item) => item.label === label);
 					const slug = show?.slug ?? label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+					if (activeSeries && slug !== activeSeries.slug) return null;
+					const sectionArticles = activeSeries
+						? visibleArticles.slice(featured.length)
+						: (articlesBySection[label] ?? []).slice(0, 3);
+					if (activeSeries && sectionArticles.length === 0) return null;
 					return (
 						<section class="show-band" id={`section-${slug}`}>
 							<div class="show-head">
 								<div class="show-head-text">
-									<h2 class="show-name">{label}</h2>
+									<h2 class="show-name">{activeSeries ? `More from ${label}` : label}</h2>
 									{show?.desc && <p class="show-desc">{show.desc}</p>}
 								</div>
-								<a href="/opinion" class="show-all">All articles →</a>
+								{!activeSeries && <a href={`/opinion?series=${slug}`} class="show-all">This series →</a>}
 							</div>
 							{sectionArticles.length === 0 ? (
 								<p class="show-empty">Articles coming soon.</p>
@@ -134,7 +142,7 @@ for (const article of articles) {
 								<div class="show-grid">
 									{sectionArticles.map((article) => {
 										return (
-											<a href={`/articles/${article.id}`} class="ep-card">
+											<a href={`/posts/${article.id}`} class="ep-card">
 												<div class="ep-media">
 													{article.data.featured_image ? (
 														<Image image={article.data.featured_image} />
@@ -213,6 +221,10 @@ for (const article of articles) {
 		transition: color var(--transition-fast), border-color var(--transition-fast);
 	}
 	.show-tab:hover {
+		color: var(--color-ink);
+		border-bottom-color: var(--color-kicker);
+	}
+	.show-tab--active {
 		color: var(--color-ink);
 		border-bottom-color: var(--color-kicker);
 	}

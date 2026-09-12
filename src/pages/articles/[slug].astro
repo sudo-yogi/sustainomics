@@ -3,21 +3,24 @@ import { getEmDashEntry, getEmDashCollection, decodeSlug } from "emdash";
 import { Image, PortableText, WidgetArea } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
+import { addCacheHint } from "../../utils/cache";
 
 const slug = decodeSlug(Astro.params.slug);
 if (!slug) return Astro.redirect("/404");
 
 const { entry: article, cacheHint } = await getEmDashEntry("articles", slug);
 if (!article) return Astro.redirect("/404");
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 // Resolve the parent issue from a.data.issue (a magazine ULID).
 const issueRef = article.data.issue;
 let issue: any = null;
 if (issueRef) {
-	const { entries: mags } = await getEmDashCollection("magazines").catch(
-		() => ({ entries: [] as any[] }),
+	const magResult = await getEmDashCollection("magazines").catch(
+		() => ({ entries: [] as any[], cacheHint: undefined }),
 	);
+	const { entries: mags } = magResult;
+	addCacheHint(Astro, magResult.cacheHint);
 	issue =
 		(mags ?? []).find((m: any) => m.data.id === issueRef || m.id === issueRef) ?? null;
 }

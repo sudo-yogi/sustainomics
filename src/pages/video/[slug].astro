@@ -3,12 +3,13 @@ import { getEmDashEntry, decodeSlug } from "emdash";
 import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import { getYouTubeId } from "../../utils/youtube";
+import { addCacheHint } from "../../utils/cache";
 
 const slug = decodeSlug(Astro.params.slug);
 if (!slug) return Astro.redirect("/404");
 const { entry: video, cacheHint } = await getEmDashEntry("videos", slug);
 if (!video) return Astro.redirect("/404");
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 const videoId = getYouTubeId(video.data.video_url);
 ---
 

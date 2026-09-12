@@ -2,11 +2,13 @@
 import { getEmDashCollection } from "emdash";
 import { Image } from "emdash/ui";
 import { getYouTubeId } from "../utils/youtube";
+import { addCacheHint } from "../utils/cache";
 
-const { entries: videos } = await getEmDashCollection("videos", {
+const { entries: videos, cacheHint } = await getEmDashCollection("videos", {
 	orderBy: { video_date: "desc" },
 	limit: 3,
 });
+addCacheHint(Astro, cacheHint);
 
 ---
 

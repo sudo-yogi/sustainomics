@@ -4,6 +4,7 @@ import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
 import { getSection } from "../../config/site-nav";
+import { addCacheHint } from "../../utils/cache";
 
 const opinionSection = getSection("opinion")!;
 const requestedSeries = Astro.url.searchParams.get("series");
@@ -17,7 +18,7 @@ const { entries: articles, cacheHint } = await getEmDashCollection("posts", {
 	orderBy: { published_at: "desc" },
 	limit: 80,
 });
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 const fmt = (d: Date | string | null | undefined) => {
 	if (!d) return null;

@@ -17,6 +17,8 @@ services:
       # Public URL the site is served from (used for absolute links/auth).
       EMDASH_SITE_URL: ${EMDASH_SITE_URL:-http://localhost:3000}
       ORIGIN: ${EMDASH_SITE_URL:-http://localhost:3000}
+      # Only set to 1 for the first start of a new empty /data volume.
+      ALLOW_FRESH_DATABASE: ${ALLOW_FRESH_DATABASE:-0}
     volumes:
       # Named volume => CMS data (SQLite DB + uploads) survives
       # `docker compose down`, restarts, and image rebuilds/updates.

@@ -18,7 +18,15 @@ Railway default domain (still active): https://web-production-e769d.up.railway.a
 3. Public domain generated
 4. Environment variables set (see below)
 
-If you recreate the project from scratch:
+Docker Compose first boot of an empty `cms-data` volume:
+
+```bash
+ALLOW_FRESH_DATABASE=1 docker compose up --build
+# After the site starts, restart without the flag:
+docker compose up -d
+```
+
+If you recreate the Railway project from scratch:
 
 ```bash
 cd sustainomics

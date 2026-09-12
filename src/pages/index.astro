@@ -11,6 +11,7 @@ import { resolveBlogSiteIdentity } from "../utils/site-identity";
 import AdBlock from "../components/AdBlock.astro";
 import VideoWidget from "../components/VideoWidget.astro";
 import { SECTIONS } from "../config/site-nav";
+import { addCacheHint } from "../utils/cache";
 
 const POSTS_LIMIT = 16;
 
@@ -98,13 +99,7 @@ const [videosResult, magsResult, bandPostsResult] = await Promise.all([
 const { entries: videos } = videosResult;
 const { entries: mags } = magsResult;
 const { entries: bandPostsRaw } = bandPostsResult;
-if (Astro.cache?.enabled) {
-	const hints = [postsCacheHint, videosResult.cacheHint, magsResult.cacheHint, bandPostsResult.cacheHint];
-	Astro.cache.set({
-		tags: [...new Set(hints.flatMap((hint) => hint.tags ?? []))],
-		lastModified: hints.map((hint) => hint.lastModified).filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0],
-	});
-}
+addCacheHint(Astro, postsCacheHint, videosResult.cacheHint, magsResult.cacheHint, bandPostsResult.cacheHint);
 
 // Group top 3 posts per news section for category bands
 const NEWS_SECTIONS = SECTIONS.filter((s) => s.kind === "category");

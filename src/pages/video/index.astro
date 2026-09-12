@@ -5,6 +5,7 @@ import Base from "../../layouts/Base.astro";
 import AdBlock from "../../components/AdBlock.astro";
 import { getSection } from "../../config/site-nav";
 import { getYouTubeId } from "../../utils/youtube";
+import { addCacheHint } from "../../utils/cache";
 
 const section = getSection("video")!;
 const CATEGORIES = section.subtabs;
@@ -14,7 +15,7 @@ const { entries: videos, cacheHint } = await getEmDashCollection("videos", {
 	orderBy: { video_date: "desc" },
 	limit: 80,
 });
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 function hrefFor(video: (typeof videos)[number]) {
 	return `/video/${video.id}`;
@@ -41,10 +42,11 @@ const featured = filtered.slice(0, 3);
 const videosByCategory: Record<string, typeof videos> = {};
 for (const category of CATEGORIES) videosByCategory[category.label] = [];
 for (const video of videos) {
-	const key =
-		CATEGORIES.find((category) => category.label.toLowerCase() === (video.data.category ?? "").toLowerCase())
-			?.label ?? CATEGORIES[0].label;
-	if (videosByCategory[key].length < 3) videosByCategory[key].push(video);
+	const key = CATEGORIES.find(
+		(category) => category.label.toLowerCase() === (video.data.category ?? "").toLowerCase(),
+	)?.label;
+	if (!key || videosByCategory[key].length >= 3) continue;
+	videosByCategory[key].push(video);
 }
 ---
 

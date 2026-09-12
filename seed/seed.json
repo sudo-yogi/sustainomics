@@ -3641,7 +3641,7 @@
 				"status": "published",
 				"data": {
 					"title": "Carbon Tax or Cap-and-Trade? The Wrong Question Is Killing the Right Policy",
-					"opinion_series": "the-sustainomics-show",
+					"opinion_series": "policy-watch",
 					"featured_image": {
 						"id": "01KV56EV7NH6PC17R4XE4PQGM4",
 						"provider": "local",
@@ -4283,7 +4283,7 @@
 				"status": "published",
 				"data": {
 					"title": "Nuclear Is Non-Negotiable. The Sooner Climate Hawks Accept This, the Better",
-					"opinion_series": "the-sustainomics-show",
+					"opinion_series": "green-economy",
 					"featured_image": {
 						"id": "01KV3TVYFV3HD8MZ94EX4W9YE7",
 						"provider": "local",
@@ -15154,7 +15154,7 @@
 				"status": "published",
 				"data": {
 					"title": "Why Green Subsidies Need Sunset Clauses",
-					"opinion_series": "the-sustainomics-show",
+					"opinion_series": "capital-chronicles",
 					"content": [
 						{
 							"_type": "block",
@@ -15378,7 +15378,7 @@
 				"status": "published",
 				"data": {
 					"title": "Adaptation Is the Climate Investment We Keep Ignoring",
-					"opinion_series": "the-sustainomics-show",
+					"opinion_series": "esg-watch",
 					"content": [
 						{
 							"_type": "block",
@@ -15602,7 +15602,7 @@
 				"status": "published",
 				"data": {
 					"title": "The Carbon Price Is Finally Doing Its Job",
-					"opinion_series": "the-sustainomics-show",
+					"opinion_series": "market-daily",
 					"featured_image": {
 						"provider": "local",
 						"id": "01KV6H2TR3KJPC7EGR5AX4JMJM",

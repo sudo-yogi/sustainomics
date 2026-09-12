@@ -4,19 +4,19 @@ This is a simple guide for adding and managing content in the EmDash dashboard.
 
 ## Open the dashboard
 
-Development dashboard:
+Local development:
 
-<http://100.99.49.120:4502/_emdash/admin>
+```bash
+npx emdash dev
+```
 
-Development account:
+Then open `/_emdash/admin` on the port printed by the dev server.
 
-- Email: `dev@emdash.local`
-- Role: Administrator
-- No password is required in the current shared development browser.
-
-Production dashboard:
+Production:
 
 <https://thesustainomics.com/_emdash/admin>
+
+Use the production admin account created at `/_emdash/admin/setup`. Do not commit development URLs, emails, or passwordless credentials.
 
 ## Dashboard options
 

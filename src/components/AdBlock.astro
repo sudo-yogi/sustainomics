@@ -1,5 +1,6 @@
 ---
 import { getEmDashCollection } from "emdash";
+import { addCacheHint } from "../utils/cache";
 
 interface Props {
 	placement: "sidebar" | "leaderboard" | "mid-page" | "homepage" | "article";
@@ -9,7 +10,7 @@ interface Props {
 const { placement, class: className } = Astro.props;
 
 const { entries: allAds, cacheHint } = await getEmDashCollection("advertisements");
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 const allMatching = allAds.filter(
 	(ad) => ad.data.placement?.trim().toLowerCase() === placement
 );

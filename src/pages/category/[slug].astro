@@ -8,6 +8,7 @@ import Base from "../../layouts/Base.astro";
 import CategoryFeed from "../../components/CategoryFeed.astro";
 import type { FeedPost } from "../../components/CategoryFeed.astro";
 import { getSection } from "../../config/site-nav";
+import { addCacheHint } from "../../utils/cache";
 
 const slug = decodeSlug(Astro.params.slug);
 const section = slug ? getSection(slug) : undefined;
@@ -28,7 +29,7 @@ const { entries: posts, cacheHint } = await getEmDashCollection("posts", {
 	orderBy: { published_at: "desc" },
 });
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+addCacheHint(Astro, cacheHint);
 
 // Batched tag + category lookups (one round-trip each, not per post).
 const ids = posts.map((p) => p.data.id);
